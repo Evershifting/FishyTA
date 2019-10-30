@@ -18,8 +18,11 @@ public class Unit : MonoBehaviour
     }
     private void Awake()
     {
+        _clickBehaviour = new DestroyOnClick(gameObject);
+        //_clickBehaviour = new LoseOnClick();
         //_moveBehaviour = new WalkBehaviour(1, gameObject, FindObjectOfType<GridManager>());
-        //_moveBehaviour = new StrafeBehaviour(1, 1, gameObject, FindObjectOfType<GridManager>());
+        _moveBehaviour = new StrafeBehaviour(1, 1, gameObject, FindObjectOfType<GridManager>());
+        _passLineBehaviour = new LoseOnPassLine();
     }
     private void Start()
     {
@@ -34,7 +37,10 @@ public class Unit : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "EndLine")
+        {
             _passLineBehaviour?.PassLine();
+            Destroy(gameObject);
+        }
     }
     private void Update()
     {

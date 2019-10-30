@@ -7,9 +7,9 @@ using UnityEngine;
 public class GridManager : MonoBehaviour
 {
     [SerializeField] private int _sizeX, _sizeY;
-    [SerializeField] private GameObject _cellPrefab;
-    [SerializeField]
-    private List<Cell> Cells = new List<Cell>();
+    [SerializeField] private GameObject _cellPrefab, _destructorPrefab;
+
+    private List<Cell> _cells = new List<Cell>();
 
     public int SizeX { get => _sizeX; private set => _sizeX = value; }
     public int SizeY { get => _sizeY; private set => _sizeY = value; }
@@ -28,22 +28,28 @@ public class GridManager : MonoBehaviour
 
     public void ClearGrid()
     {
-        for (int i = Cells.Count; i > 0; i--)
+        for (int i = _cells.Count; i > 0; i--)
         {
-            Destroy(Cells[i - 1].gameObject);
-            Cells.RemoveAt(Cells.Count - 1);
+            Destroy(_cells[i - 1].gameObject);
+            _cells.RemoveAt(_cells.Count - 1);
         }
     }
     private void GenerateField(int SizeX, int SizeY)
     {
-        GameObject gameObject;
+        GameObject spawnedObject;
         for (int i = 0; i < SizeX; i++)
         {
             for (int j = 0; j < SizeY; j++)
             {
-                gameObject = Instantiate(_cellPrefab, Cell0x0() + Vector3.right * i + Vector3.forward * j, _cellPrefab.transform.rotation, transform);
-                gameObject.AddComponent<Cell>().Init(this, new Vector2(i, j));
-                Cells.Add(gameObject.GetComponent<Cell>());
+                spawnedObject = Instantiate
+                    (_cellPrefab, Cell0x0() + Vector3.right * i + Vector3.forward * j, _cellPrefab.transform.rotation, transform);
+                spawnedObject.AddComponent<Cell>().Init(this, new Vector2(i, j));
+                _cells.Add(spawnedObject.GetComponent<Cell>());
+                if (j == 0)
+                {
+                    GameObject destructor = Instantiate
+                        (_destructorPrefab, Cell0x0() + Vector3.right * i + Vector3.forward * j, _destructorPrefab.transform.rotation, spawnedObject.transform);
+                }
             }
         }
     }
@@ -75,7 +81,7 @@ public class GridManager : MonoBehaviour
     }
     public Cell GetCellByVector2(Vector2 position)
     {
-        return Cells[(int)position.x * SizeY + (int)position.y];
+        return _cells[(int)position.x * SizeY + (int)position.y];
     }
 
     public Cell GetCellByVector3(Vector3 position)
